@@ -17,7 +17,21 @@ import java.io.StringReader;
  */
 public class Tokenizer {
 
-    public static String tonkenizeBOW(String text) throws IOException {
+    public static String[] tonkenizeBOW(String text) throws IOException {
+        return tokenize(text);
+    }
+
+    public static String[] tonkenizeBi(String text) throws IOException {
+        String[] tokens = tokenize(text);
+        String[] biTokens = new String[tokens.length - 1];
+
+        for (int i = 0; i < tokens.length - 1; i++) {
+            biTokens[i] = tokens[i] + tokens[i + 1];
+        }
+        return biTokens;
+    }
+
+    private static String[] tokenize(String text) throws IOException {
         // case folding
         text = text.toLowerCase();
 
@@ -25,7 +39,7 @@ public class Tokenizer {
         StringBuilder stringBuilder = new StringBuilder();
         String[] tokens = text.split("\\s");
         for (String s : tokens) {
-            String result = s.replaceAll("[-+.^:,*?!]", " ");
+            String result = s.replaceAll("[-+.^:,*?!_]", " ");
             if (!result.isEmpty()) {
                 stringBuilder.append(result + " ");
             }
@@ -46,14 +60,7 @@ public class Tokenizer {
             }
         }
 
-        return stemmingResult.toString();
-    }
-
-    public static String[] tonkenizeBi(String text) {
-        //TODO perform removing of special chars
-        //TODO perform case folding
-        //TODO perform
-        return null;
+        return stemmingResult.toString().split("\\s");
     }
 
     private static String removeStopWords(String text) throws IOException {
