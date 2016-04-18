@@ -10,6 +10,7 @@ public class Main {
 
     private static Boolean bowIndexing = null;
     private static ArrayList<File> fileList = new ArrayList<>();
+    private static int N = 2293;    // total number of files
 
     public static void main(String[] args) {
         System.out.println("Index with bag-of-words(1) or bi-word(2)?");
@@ -33,8 +34,8 @@ public class Main {
         int docCounter = 0;
         for (File f : fileList) {
             try {
-                System.out.println("Handling Document #" + docCounter++);
-                handleDocument(f);
+                System.out.println("Handling Document #" + docCounter++ + " of " + N);
+                handleFile(f);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -43,7 +44,7 @@ public class Main {
 //        System.out.println("Search for a topic with: #topicNr <bow or bi>");
     }
 
-    private static void handleDocument(File f) throws IOException {
+    private static void handleFile(File f) throws IOException {
         BufferedReader bufferedReader = new BufferedReader(new FileReader(f.getPath()));
 
         StringBuilder contentBuilder = new StringBuilder();
@@ -51,6 +52,7 @@ public class Main {
 
         // read line for line in document
         String line;
+        String docNo = "";
         while ((line = bufferedReader.readLine()) != null) {
             if (line.equals("<DOC>")) {
                 // new document started
@@ -61,7 +63,6 @@ public class Main {
                 for (String s : splitByWhiteSpace) {
                     if (s.startsWith("<DOCNO>")) {
                         // store document number
-                        String docNo;
                         if (splitByWhiteSpace.length == 1) {
                             docNo = s.substring(s.indexOf(">"), s.lastIndexOf("<"));
                         } else {
@@ -77,11 +78,10 @@ public class Main {
                 if (readingText) {
                     if (line.equals("</TEXT>")) {
                         readingText = false;
-                        if (bowIndexing) {
-                            String[] tokens = Tokenizer.tonkenizeBOW(contentBuilder.toString());
-                        } else {
-                            String[] tokens = Tokenizer.tonkenizeBi(contentBuilder.toString());
-                        }
+                        String[] terms;
+                            terms = (bowIndexing) ? Tokenizer.tonkenizeBOW(contentBuilder.toString()) :
+                                    Tokenizer.tonkenizeBi(contentBuilder.toString());
+                        Indexer.index(docNo, terms, bowIndexing);
                     } else if (line.equals("<TEXT>")) {
                         // don't add <TEXT>
                     } else {
