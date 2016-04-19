@@ -15,11 +15,6 @@ public class Indexer {
     private static HashMap<String, Map<String, Integer>> dictionary = new HashMap<>();
 
     public static void index(String docNo, String[] terms, boolean bowIndexing) {
-        if (indexExisting(bowIndexing)) {
-            loadDictionary(bowIndexing);
-            return;
-        }
-
         for (String term : terms) {
             if (dictionary.get(term) == null) {
                 // term not in dictionary yet
@@ -34,20 +29,15 @@ public class Indexer {
                 dictionary.get(term).put(docNo, dictionary.get(term).get(docNo) + 1);
             }
         }
-
-        saveDictionary(bowIndexing);
     }
 
     private static boolean indexExisting(boolean bowIndexing) {
         String indexFileName = (bowIndexing) ? BOW_INDEX_NAME : BI_INDEX_NAME;
         File indexFile = new File(indexFileName);
-        if (indexFile.exists() && indexFile.exists()) {
-            return  true;
-        }
-        return false;
+        return indexFile.exists();
     }
 
-    private static void saveDictionary(boolean bowIndexing) {
+    public static void saveDictionary(boolean bowIndexing) {
         String indexFileName = (bowIndexing) ? BOW_INDEX_NAME : BI_INDEX_NAME;
         File indexFile = new File(indexFileName);
         try {
@@ -83,13 +73,13 @@ public class Indexer {
                 try {
                     bufferedWriter.close();
                 } catch (IOException e) {
-                    System.out.println("Error clowing BufferedWriter.");
+                    System.out.println("Error closing BufferedWriter.");
                 }
             }
         }
     }
 
-    private static void loadDictionary(boolean bowIndexing) {
+    public static void loadDictionary(boolean bowIndexing) {
         String indexFileName = (bowIndexing) ? BOW_INDEX_NAME : BI_INDEX_NAME;
         File indexFile = new File(indexFileName);
         try {
@@ -124,8 +114,8 @@ public class Indexer {
         }
     }
 
-    public HashMap<String, Map<String, Integer>> getDictionary(boolean bowIndexing) {
-        if (dictionary == null) {
+    public static HashMap<String, Map<String, Integer>> getDictionary(boolean bowIndexing) {
+        if (dictionary == null && indexExisting(bowIndexing)) {
             loadDictionary(bowIndexing);
         }
         return dictionary;

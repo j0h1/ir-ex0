@@ -31,14 +31,21 @@ public class Main {
 
         retrieveFileList(new File("Adhoc/").listFiles());
 
-        int docCounter = 0;
-        for (File f : fileList) {
-            try {
-                System.out.println("Handling Document #" + docCounter++ + " of " + N);
-                handleFile(f);
-            } catch (IOException e) {
-                e.printStackTrace();
+        if (!Indexer.getDictionary(bowIndexing).isEmpty()) {
+            // index file persisted locally
+        } else {
+            // create/save index
+            int docCounter = 0;
+            for (File f : fileList) {
+                try {
+                    System.out.println("Handling Document #" + docCounter++ + " of " + N);
+                    handleFile(f);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
+
+            Indexer.saveDictionary(bowIndexing);
         }
 //
 //        System.out.println("Search for a topic with: #topicNr <bow or bi>");
