@@ -8,6 +8,8 @@ import java.util.Scanner;
 
 public class Main {
 
+    private static Indexer indexer;
+
     private static Boolean bowIndexing = null;
     private static ArrayList<File> fileList = new ArrayList<>();
     private static int N = 2293;    // total number of files
@@ -31,21 +33,17 @@ public class Main {
 
         retrieveFileList(new File("Adhoc/").listFiles());
 
-        if (!Indexer.getDictionary(bowIndexing).isEmpty()) {
-            // index file persisted locally
-        } else {
-            // create/save index
-            int docCounter = 0;
-            for (File f : fileList) {
-                try {
-                    System.out.println("Handling Document #" + docCounter++ + " of " + N);
-                    handleFile(f);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
+        indexer = Indexer.getInstance(bowIndexing);
 
-            Indexer.saveDictionary(bowIndexing);
+        // create/save index
+        int docCounter = 0;
+        for (File f : fileList) {
+            try {
+                System.out.println("Handling Document #" + docCounter++ + " of " + N);
+                handleFile(f);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
 //
 //        System.out.println("Search for a topic with: #topicNr <bow or bi>");
@@ -88,7 +86,7 @@ public class Main {
                         String[] terms;
                             terms = (bowIndexing) ? Tokenizer.tonkenizeBOW(contentBuilder.toString()) :
                                     Tokenizer.tonkenizeBi(contentBuilder.toString());
-                        Indexer.index(docNo, terms, bowIndexing);
+                        indexer.index(docNo, terms, bowIndexing);
                     } else if (line.equals("<TEXT>")) {
                         // don't add <TEXT>
                     } else {
